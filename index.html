@@ -2,132 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Primer App </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lista de Usuarios</title>
     <style type="text/css">
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #696969;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        #main {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-        }
-
-        h3 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        input[type="number"], input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        label {
-            color: #555;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        fieldset {
-            border: none;
-            padding: 0;
-        }
-
-        hr {
-            margin: 20px 0;
-        }
-
-        .result {
-            font-size: 20px;
-            font-weight: bold;
-            color: #28a745;
-            margin-top: 10px;
-        }
+        input { background-color: cyan; }
     </style>
 </head>
 <body>
     <div id="main">
-        <h3> Bienvenido a {{ primer_app }}</h3>
+        <h1> Lista de usuarios </h1>
 
-        <button @click="contador++">Click me: {{ contador }}</button>
+        <ul>
+            <li v-for="user in users" :key="user.name">
+                {{ user.name }} - {{ user.rol }}
+            </li>
+        </ul>
 
-        <hr>
-        
+        <br>
+
         <form>
             <fieldset>
-                <label>Nombre</label>
-                <input type="text" v-model="usuario" placeholder="Escribe aquí">
+                <label> Nombre: </label>
+                <input type="text" v-model="name" />
             </fieldset>
 
-            <label>Tu nombre es: <span>{{ usuario }}</span></label>
+            <br>
+
+            <fieldset>
+                <label> Rol: </label>
+                <input type="text" v-model="rol" />
+            </fieldset>
+
+            <br>
+
+            <button v-on:click="addNewUser" type="button">
+                Guardar usuario
+            </button>
         </form>
-
-        <hr>
-
-        <form>
-            <input type="number" v-model="num1" placeholder="Número 1">
-
-            <input type="number" v-model="num2" placeholder="Número 2">
-
-            <button v-on:click="resultado = num1 + num2" type="button">Sumar</button>
-        </form>
-
-        <div class="result">{{ resultado }}</div>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script>
-        const { createApp, ref } = Vue
+        const { createApp, ref } = Vue;
 
         createApp({
             setup() {
-                const primer_app = ref('mi primera app')
-                let contador = ref(0)
-                let usuario = ref('')
-                let resultado = ref(0)
-                let num1 = ref('')
-                let num2 = ref('')
+                let name = ref('');
+                let rol = ref('');
+                let users = ref([
+                    { "name": "Angel", "rol": "Frontend" },
+                    { "name": "Diego", "rol": "Backend" },
+                    { "name": "Eduardo", "rol": "Movil" },
+                    { "name": "Erik", "rol": "Backend" }
+                ]);
+
+                function addNewUser() {
+                    if (name.value && rol.value) {
+                        users.value.push({ name: name.value, rol: rol.value });
+                        name.value = '';
+                        rol.value = '';
+                    }
+                }
 
                 return {
-                    primer_app,
-                    contador,
-                    usuario,
-                    resultado,
-                    num1,
-                    num2
-                }
+                    users,
+                    name,
+                    rol,
+                    addNewUser
+                };
             }
-        }).mount('#main')
+        }).mount('#main');
     </script>
 </body>
 </html>

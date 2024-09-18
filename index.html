@@ -2,76 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lista de Usuarios</title>
-    <style type="text/css">
-        input { background-color: cyan; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
 </head>
 <body>
     <div id="main">
-        <h1> Lista de usuarios </h1>
+        <h1>Login</h1>
+        <form @submit.prevent="iniciarSesion">
 
-        <ul>
-            <li v-for="user in users" :key="user.name">
-                {{ user.name }} - {{ user.rol }}
-            </li>
-        </ul>
+            <fieldset v-if="!sesionIniciada">
 
-        <br>
+                <label> Usuario: </label>
+                <input type="text" v-model="usuario" />
 
-        <form>
-            <fieldset>
-                <label> Nombre: </label>
-                <input type="text" v-model="name" />
+            </fieldset>
+
+            <fieldset v-if="!sesionIniciada">
+
+                <label> Contraseña: </label>
+                <input type="password" v-model="contrasena" />
+
             </fieldset>
 
             <br>
 
-            <fieldset>
-                <label> Rol: </label>
-                <input type="text" v-model="rol" />
-            </fieldset>
+            <button v-if="!sesionIniciada" type="submit">Iniciar Sesión</button>
 
-            <br>
+            <h1 v-if="sesionIniciada">¡Bienvenido, {{ usuario }}!</h1>
 
-            <button v-on:click="addNewUser" type="button">
-                Guardar usuario
-            </button>
         </form>
+
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
     <script>
         const { createApp, ref } = Vue;
 
         createApp({
-            setup() {
-                let name = ref('');
-                let rol = ref('');
-                let users = ref([
-                    { "name": "Angel", "rol": "Frontend" },
-                    { "name": "Diego", "rol": "Backend" },
-                    { "name": "Eduardo", "rol": "Movil" },
-                    { "name": "Erik", "rol": "Backend" }
-                ]);
 
-                function addNewUser() {
-                    if (name.value && rol.value) {
-                        users.value.push({ name: name.value, rol: rol.value });
-                        name.value = '';
-                        rol.value = '';
-                    }
-                }
-
+            data() {
                 return {
-                    users,
-                    name,
-                    rol,
-                    addNewUser
+                    usuario: '',
+                    contraseña: '',
+                    sesionIniciada: false, 
+                    mensajeError: ''
                 };
+            },
+
+            methods: {
+
+                iniciarSesion() {
+                    fetch('usuarios.json')
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Error al cargar el archivo JSON');
+                            }
+                            return response.json();
+                        })
+
+                        .then(data => {
+                            const usuarioValido = data.find(u => 
+                                u.email === this.usuario && u.password === this.contraseña
+                            );
+                            if (usuarioValido) {
+
+                                this.sesionIniciada = true;
+                            } else {
+                                alert('Usuario o contraseña incorrectos');
+                            }
+                        })
+
+                        .catch(err => {
+
+                            alert('Error al cargar usuarios: ' + err.message);
+
+                        });
+                }
             }
         }).mount('#main');
+        
     </script>
 </body>
 </html>

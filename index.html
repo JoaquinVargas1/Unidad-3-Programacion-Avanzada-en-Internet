@@ -1,25 +1,42 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lista de Usuarios</title>
+    <style type="text/css">
+        input { background-color: cyan; }
+    </style>
 </head>
 <body>
     <div id="main">
-        <form @submit.prevent="login">
+        <h1> Lista de usuarios </h1>
+
+        <ul>
+            <li v-for="user in users" :key="user.name">
+                {{ user.name }} - {{ user.rol }}
+            </li>
+        </ul>
+
+        <br>
+
+        <form>
             <fieldset>
-                <label> User: </label>
-                <input type="text" v-model="user" />
+                <label> Nombre: </label>
+                <input type="text" v-model="name" />
             </fieldset>
 
+            <br>
+
             <fieldset>
-                <label> Password: </label>
-                <input type="password" v-model="password" />
+                <label> Rol: </label>
+                <input type="text" v-model="rol" />
             </fieldset>
 
-            <button type="submit">
-                Login
+            <br>
+
+            <button v-on:click="addNewUser" type="button">
+                Guardar usuario
             </button>
         </form>
     </div>
@@ -30,41 +47,28 @@
 
         createApp({
             setup() {
-                let user = ref('');
-                let password = ref('');
+                let name = ref('');
+                let rol = ref('');
+                let users = ref([
+                    { "name": "Angel", "rol": "Frontend" },
+                    { "name": "Diego", "rol": "Backend" },
+                    { "name": "Eduardo", "rol": "Movil" },
+                    { "name": "Erik", "rol": "Backend" }
+                ]);
 
-                function login() {
-                    fetch('usuarios.json')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Error al cargar el archivo JSON');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            const usuariosValidos = data.map((usuario) => {
-                                if (usuario.email === user.value && usuario.password === password.value) {
-                                    return usuario;
-                                }
-                                return null; 
-                            }).filter(usuario => usuario !== null); 
-
-                            if (usuariosValidos.length > 0) {
-                                alert('Login exitoso');
-                            } else {
-
-                                alert('Usuario o contraseña incorrectos');
-                            }
-                        })
-                        .catch(err => {
-                            alert('Error al cargar usuarios: ' + err.message);
-                        });
+                function addNewUser() {
+                    if (name.value && rol.value) {
+                        users.value.push({ name: name.value, rol: rol.value });
+                        name.value = '';
+                        rol.value = '';
+                    }
                 }
 
                 return {
-                    user,
-                    password,
-                    login
+                    users,
+                    name,
+                    rol,
+                    addNewUser
                 };
             }
         }).mount('#main');

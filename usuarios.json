@@ -1,23 +1,94 @@
 [
-    {
+  {
       "email": "mario.ramos@example.com",
-      "password": "Elefante2023"
-    },
-    {
+      "password": "Elefante2023",
+      "nombre": "Mario",
+      "apellido": "Ramos",
+      "edad": 35,
+      "telefono": "5551234567",
+      "direccion": "Calle A, 123, Ciudad Central"
+  },
+  {
       "email": "carla.sandoval@example.com",
-      "password": "Ventana4567"
-    },
-    {
+      "password": "Ventana4567",
+      "nombre": "Carla",
+      "apellido": "Sandoval",
+      "edad": 28,
+      "telefono": "5555678123",
+      "direccion": "Avenida B, 45, Ciudad Jardín"
+  },
+  {
       "email": "sebastian.mora@example.com",
-      "password": "Coche7890"
-    },
-    {
+      "password": "Coche7890",
+      "nombre": "Sebastián",
+      "apellido": "Mora",
+      "edad": 42,
+      "telefono": "5559012345",
+      "direccion": "Calle C, 789, Ciudad Nueva"
+  },
+  {
       "email": "valeria.rodriguez@example.com",
-      "password": "Montaña1234"
-    },
-    {
+      "password": "Montaña1234",
+      "nombre": "Valeria",
+      "apellido": "Rodríguez",
+      "edad": 31,
+      "telefono": "5553456789",
+      "direccion": "Boulevard D, 10, Ciudad Antigua"
+  },
+  {
       "email": "martin.benitez@example.com",
-      "password": "Mariposa5678"
-    }
-  ]
+      "password": "Mariposa5678",
+      "nombre": "Martín",
+      "apellido": "Benítez",
+      "edad": 29,
+      "telefono": "5557890123",
+      "direccion": "Calle E, 67, Ciudad Estrella"
+  },
+  {
+      "email": "andres.gomez@example.com",
+      "password": "Luna2468",
+      "nombre": "Andrés",
+      "apellido": "Gómez",
+      "edad": 37,
+      "telefono": "5551122334",
+      "direccion": "Avenida F, 98, Ciudad Central"
+  },
+  {
+      "email": "paula.martinez@example.com",
+      "password": "Sol1357",
+      "nombre": "Paula",
+      "apellido": "Martínez",
+      "edad": 33,
+      "telefono": "5553344556",
+      "direccion": "Calle G, 22, Ciudad Jardín"
+  },
+  {
+      "email": "lucia.perez@example.com",
+      "password": "Rio9012",
+      "nombre": "Lucía",
+      "apellido": "Pérez",
+      "edad": 26,
+      "telefono": "5555566789",
+      "direccion": "Avenida H, 120, Ciudad Nueva"
+  },
+  {
+      "email": "jorge.lopez@example.com",
+      "password": "Bosque3456",
+      "nombre": "Jorge",
+      "apellido": "López",
+      "edad": 45,
+      "telefono": "5557788990",
+      "direccion": "Calle I, 333, Ciudad Antigua"
+  },
+  {
+      "email": "diana.garcia@example.com",
+      "password": "Flor5678",
+      "nombre": "Diana",
+      "apellido": "García",
+      "edad": 40,
+      "telefono": "5559900123",
+      "direccion": "Boulevard J, 89, Ciudad Estrella"
+  }
+]
+
   

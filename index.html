@@ -1,37 +1,83 @@
-<!DOCTYPE html>
+<!DOCTYPE html>  
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #67fff0;
+        }
+
+        h1, h2 {
+            margin: 0; 
+        }
+
+        h1.hidden {
+            display: none; 
+        }
+    </style>
 </head>
 <body>
     <div id="main">
-        <h1>Login</h1>
+        <h1 :class="{ hidden: sesionIniciada }">Login</h1>
+
+        <br>
+
         <form @submit.prevent="iniciarSesion">
 
             <fieldset v-if="!sesionIniciada">
-
                 <label> Usuario: </label>
                 <input type="text" v-model="usuario" />
-
             </fieldset>
 
             <fieldset v-if="!sesionIniciada">
-
                 <label> Contraseña: </label>
-                <input type="password" v-model="contrasena" />
-
+                <input type="password" v-model="contraseña" />
             </fieldset>
 
             <br>
 
             <button v-if="!sesionIniciada" type="submit">Iniciar Sesión</button>
 
-            <h1 v-if="sesionIniciada">¡Bienvenido, {{ usuario }}!</h1>
+            <h2 v-if="sesionIniciada">¡Bienvenid@,  {{ nombreUsuario }}!</h2>
 
+            <div v-if="sesionIniciada">
+                <h3>Usuarios registrados:</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Edad</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="user in usuariosRegistrados" :key="user.email">
+                            <td>{{ user.nombre }}</td>
+                            <td>{{ user.apellido }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.edad }}</td>
+                            <td>{{ user.telefono }}</td>
+                            <td>{{ user.direccion }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </form>
-
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -40,18 +86,17 @@
         const { createApp, ref } = Vue;
 
         createApp({
-
             data() {
                 return {
-                    usuario: '',
+                    usuario: sessionStorage.getItem('usuario') || '', 
                     contraseña: '',
-                    sesionIniciada: false, 
-                    mensajeError: ''
+                    sesionIniciada: !!sessionStorage.getItem('sesionIniciada'),
+                    nombreUsuario: sessionStorage.getItem('nombreUsuario') || '',
+                    usuariosRegistrados: [] 
                 };
             },
 
             methods: {
-
                 iniciarSesion() {
                     fetch('usuarios.json')
                         .then(response => {
@@ -60,28 +105,28 @@
                             }
                             return response.json();
                         })
-
                         .then(data => {
                             const usuarioValido = data.find(u => 
                                 u.email === this.usuario && u.password === this.contraseña
                             );
                             if (usuarioValido) {
-
                                 this.sesionIniciada = true;
+                                this.nombreUsuario = usuarioValido.nombre;
+                                sessionStorage.setItem('usuario', this.usuario); 
+                                sessionStorage.setItem('nombreUsuario', usuarioValido.nombre);
+                                sessionStorage.setItem('sesionIniciada', true); 
+                                this.usuariosRegistrados = data; 
                             } else {
                                 alert('Usuario o contraseña incorrectos');
                             }
                         })
-
                         .catch(err => {
-
                             alert('Error al cargar usuarios: ' + err.message);
-
                         });
                 }
             }
         }).mount('#main');
-        
     </script>
 </body>
 </html>
+

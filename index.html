@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>  
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -26,78 +26,132 @@
         h1.hidden {
             display: none; 
         }
+
+        .form-edit {
+            margin-top: 20px;
+        }
+        .form-edit label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        .form-edit input {
+            width: 100%;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-edit button {
+            margin-top: 15px;
+            padding: 10px 20px;
+        }
     </style>
 </head>
 <body>
     <div id="main">
         <h1 :class="{ hidden: sesionIniciada }">Login</h1>
-
         <br>
 
-        <form @submit.prevent="iniciarSesion">
-            <fieldset v-if="!sesionIniciada">
-                <label> Usuario: </label>
+        <form v-if="!sesionIniciada" @submit.prevent="iniciarSesion">
+            <fieldset>
+                <label>Usuario: </label>
                 <input type="text" v-model="usuario" />
             </fieldset>
 
-            <fieldset v-if="!sesionIniciada">
-                <label> Contraseña: </label>
+            <fieldset>
+                <label>Contraseña: </label>
                 <input type="password" v-model="contraseña" />
             </fieldset>
+            <br>
+
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+
+        <h2 v-if="sesionIniciada && usuarioEditado === null">¡Bienvenid@, {{ nombreUsuario }}!</h2>
+
+        <div v-if="sesionIniciada && usuarioEditado === null">
+            <h3>Usuarios registrados:</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Email</th>
+                        <th>Edad</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(user, index) in usuariosRegistrados" :key="user.email">
+                        <td>{{ user.nombre }}</td>
+                        <td>{{ user.apellido }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.edad }}</td>
+                        <td>{{ user.telefono }}</td>
+                        <td>{{ user.direccion }}</td>
+                        <td>
+                            <button class="btn btn-edit" @click="editarUsuario(index)">Editar</button>
+                            <button class="btn btn-delete" @click="eliminarUsuario(index)">Eliminar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div v-if="usuarioEditado !== null" class="form-edit">
+            <h2>Editar Usuario</h2>
 
             <br>
 
-            <button v-if="!sesionIniciada" type="submit">Iniciar Sesión</button>
+            <form @submit.prevent="guardarEdicion">
+                <label>Nombre:</label>
+                <input type="text" v-model="formUsuario.nombre" required>
+                <br>
 
-            <h2 v-if="sesionIniciada">¡Bienvenid@, {{ nombreUsuario }}!</h2>
+                <label>Apellido:</label>
+                <input type="text" v-model="formUsuario.apellido" required>
+                <br>
 
-            <div v-if="sesionIniciada">
-                <h3>Usuarios registrados:</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Email</th>
-                            <th>Edad</th>
-                            <th>Teléfono</th>
-                            <th>Dirección</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(user, index) in usuariosRegistrados" :key="user.email">
-                            <td>{{ user.nombre }}</td>
-                            <td>{{ user.apellido }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.edad }}</td>
-                            <td>{{ user.telefono }}</td>
-                            <td>{{ user.direccion }}</td>
-                            <td>
-                                <button class="btn btn-edit" @click="editarUsuario(index)">Editar</button>
-                                <button class="btn btn-delete" @click="eliminarUsuario(index)">Eliminar</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </form>
+                <label>Email:</label>
+                <input type="email" v-model="formUsuario.email" required>
+                <br>
+
+                <label>Edad:</label>
+                <input type="number" v-model="formUsuario.edad" required>
+                <br>
+
+                <label>Teléfono:</label>
+                <input type="text" v-model="formUsuario.telefono" required>
+                <br>
+
+                <label>Dirección:</label>
+                <input type="text" v-model="formUsuario.direccion" required>
+                <br><br>
+
+                <button type="submit">Guardar</button>
+                <button type="button" @click="cancelarEdicion">Cancelar</button>
+            </form>
+        </div>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
     <script>
-        const { createApp, ref } = Vue;
+        const { createApp } = Vue;
 
         createApp({
             data() {
                 return {
-                    usuario: sessionStorage.getItem('usuario') || '', 
+                    usuario: sessionStorage.getItem('usuario') || '',
                     contraseña: '',
                     sesionIniciada: !!sessionStorage.getItem('sesionIniciada'),
                     nombreUsuario: sessionStorage.getItem('nombreUsuario') || '',
                     usuariosRegistrados: JSON.parse(sessionStorage.getItem('usuariosRegistrados')) || [],
                     usuarioEditado: null,
+                    formUsuario: { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' }
                 };
             },
 
@@ -117,10 +171,10 @@
                             if (usuarioValido) {
                                 this.sesionIniciada = true;
                                 this.nombreUsuario = usuarioValido.nombre;
-                                sessionStorage.setItem('usuario', this.usuario); 
+                                sessionStorage.setItem('usuario', this.usuario);
                                 sessionStorage.setItem('nombreUsuario', usuarioValido.nombre);
-                                sessionStorage.setItem('sesionIniciada', true); 
-                                sessionStorage.setItem('usuariosRegistrados', JSON.stringify(data)); 
+                                sessionStorage.setItem('sesionIniciada', true);
+                                sessionStorage.setItem('usuariosRegistrados', JSON.stringify(data));
                                 this.usuariosRegistrados = data;
                             } else {
                                 alert('Usuario o contraseña incorrectos');
@@ -129,6 +183,24 @@
                         .catch(err => {
                             alert('Error al cargar usuarios: ' + err.message);
                         });
+                },
+
+                editarUsuario(index) {
+                    this.usuarioEditado = index;
+                    const user = this.usuariosRegistrados[index];
+                    this.formUsuario = { ...user };
+                },
+
+                guardarEdicion() {
+                    if (this.usuarioEditado !== null) {
+                        this.usuariosRegistrados[this.usuarioEditado] = { ...this.formUsuario };
+                        sessionStorage.setItem('usuariosRegistrados', JSON.stringify(this.usuariosRegistrados));
+                        this.usuarioEditado = null;
+                    }
+                },
+
+                cancelarEdicion() {
+                    this.usuarioEditado = null;
                 },
 
                 eliminarUsuario(index) {

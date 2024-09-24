@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -35,7 +35,6 @@
         <br>
 
         <form @submit.prevent="iniciarSesion">
-
             <fieldset v-if="!sesionIniciada">
                 <label> Usuario: </label>
                 <input type="text" v-model="usuario" />
@@ -50,7 +49,7 @@
 
             <button v-if="!sesionIniciada" type="submit">Iniciar Sesión</button>
 
-            <h2 v-if="sesionIniciada">¡Bienvenid@,  {{ nombreUsuario }}!</h2>
+            <h2 v-if="sesionIniciada">¡Bienvenid@, {{ nombreUsuario }}!</h2>
 
             <div v-if="sesionIniciada">
                 <h3>Usuarios registrados:</h3>
@@ -63,16 +62,21 @@
                             <th>Edad</th>
                             <th>Teléfono</th>
                             <th>Dirección</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="user in usuariosRegistrados" :key="user.email">
+                        <tr v-for="(user, index) in usuariosRegistrados" :key="user.email">
                             <td>{{ user.nombre }}</td>
                             <td>{{ user.apellido }}</td>
                             <td>{{ user.email }}</td>
                             <td>{{ user.edad }}</td>
                             <td>{{ user.telefono }}</td>
                             <td>{{ user.direccion }}</td>
+                            <td>
+                                <button class="btn btn-edit" @click="editarUsuario(index)">Editar</button>
+                                <button class="btn btn-delete" @click="eliminarUsuario(index)">Eliminar</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -92,7 +96,8 @@
                     contraseña: '',
                     sesionIniciada: !!sessionStorage.getItem('sesionIniciada'),
                     nombreUsuario: sessionStorage.getItem('nombreUsuario') || '',
-                    usuariosRegistrados: [] 
+                    usuariosRegistrados: JSON.parse(sessionStorage.getItem('usuariosRegistrados')) || [],
+                    usuarioEditado: null,
                 };
             },
 
@@ -115,7 +120,8 @@
                                 sessionStorage.setItem('usuario', this.usuario); 
                                 sessionStorage.setItem('nombreUsuario', usuarioValido.nombre);
                                 sessionStorage.setItem('sesionIniciada', true); 
-                                this.usuariosRegistrados = data; 
+                                sessionStorage.setItem('usuariosRegistrados', JSON.stringify(data)); 
+                                this.usuariosRegistrados = data;
                             } else {
                                 alert('Usuario o contraseña incorrectos');
                             }
@@ -123,10 +129,14 @@
                         .catch(err => {
                             alert('Error al cargar usuarios: ' + err.message);
                         });
+                },
+
+                eliminarUsuario(index) {
+                    this.usuariosRegistrados.splice(index, 1);
+                    sessionStorage.setItem('usuariosRegistrados', JSON.stringify(this.usuariosRegistrados));
                 }
             }
         }).mount('#main');
     </script>
 </body>
 </html>
-

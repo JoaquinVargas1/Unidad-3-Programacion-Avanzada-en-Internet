@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -72,7 +72,8 @@
 
         <div v-if="sesionIniciada && usuarioEditado === null">
             <h3>Usuarios registrados:</h3>
-            <table>
+            <button @click="mostrarFormularioNuevoUsuario">Agregar Usuario</button>
+            <table v-if="!formNuevoUsuarioVisible">
                 <thead>
                     <tr>
                         <th>Nombre</th>
@@ -135,6 +136,39 @@
                 <button type="button" @click="cancelarEdicion">Cancelar</button>
             </form>
         </div>
+
+        <div v-if="formNuevoUsuarioVisible" class="form-edit">
+            <h2>Agregar Nuevo Usuario</h2>
+
+            <form @submit.prevent="agregarUsuario">
+                <label>Nombre:</label>
+                <input type="text" v-model="formNuevoUsuario.nombre" required>
+                <br>
+
+                <label>Apellido:</label>
+                <input type="text" v-model="formNuevoUsuario.apellido" required>
+                <br>
+
+                <label>Email:</label>
+                <input type="email" v-model="formNuevoUsuario.email" required>
+                <br>
+
+                <label>Edad:</label>
+                <input type="number" v-model="formNuevoUsuario.edad" required>
+                <br>
+
+                <label>Teléfono:</label>
+                <input type="text" v-model="formNuevoUsuario.telefono" required>
+                <br>
+
+                <label>Dirección:</label>
+                <input type="text" v-model="formNuevoUsuario.direccion" required>
+                <br><br>
+
+                <button type="submit">Agregar Usuario</button>
+                <button type="button" @click="cancelarNuevoUsuario">Cancelar</button>
+            </form>
+        </div>
     </div>
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -151,7 +185,9 @@
                     nombreUsuario: sessionStorage.getItem('nombreUsuario') || '',
                     usuariosRegistrados: JSON.parse(sessionStorage.getItem('usuariosRegistrados')) || [],
                     usuarioEditado: null,
-                    formUsuario: { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' }
+                    formUsuario: { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' },
+                    formNuevoUsuarioVisible: false,
+                    formNuevoUsuario: { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' }
                 };
             },
 
@@ -206,6 +242,21 @@
                 eliminarUsuario(index) {
                     this.usuariosRegistrados.splice(index, 1);
                     sessionStorage.setItem('usuariosRegistrados', JSON.stringify(this.usuariosRegistrados));
+                },
+
+                mostrarFormularioNuevoUsuario() {
+                    this.formNuevoUsuarioVisible = true;
+                    this.formNuevoUsuario = { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' };
+                },
+
+                agregarUsuario() {
+                    this.usuariosRegistrados.push({ ...this.formNuevoUsuario });
+                    sessionStorage.setItem('usuariosRegistrados', JSON.stringify(this.usuariosRegistrados));
+                    this.formNuevoUsuarioVisible = false;
+                },
+
+                cancelarNuevoUsuario() {
+                    this.formNuevoUsuarioVisible = false;
                 }
             }
         }).mount('#main');

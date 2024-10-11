@@ -1,265 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <style>
-        table {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333; 
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        form {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
         }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #67fff0;
-        }
-
-        h1, h2 {
-            margin: 0; 
-        }
-
-        h1.hidden {
-            display: none; 
-        }
-
-        .form-edit {
-            margin-top: 20px;
-        }
-        .form-edit label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-
-        .form-edit input {
+        input {
             width: 100%;
-            padding: 5px;
-            box-sizing: border-box;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-
-        .form-edit button {
-            margin-top: 15px;
-            padding: 10px 20px;
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div id="main">
-        <h1 :class="{ hidden: sesionIniciada }">Login</h1>
-        <br>
-
-        <form v-if="!sesionIniciada" @submit.prevent="iniciarSesion">
-            <fieldset>
-                <label>Usuario: </label>
-                <input type="text" v-model="usuario" />
-            </fieldset>
-
-            <fieldset>
-                <label>Contraseña: </label>
-                <input type="password" v-model="contraseña" />
-            </fieldset>
-            <br>
-
-            <button type="submit">Iniciar Sesión</button>
-        </form>
-
-        <h2 v-if="sesionIniciada && usuarioEditado === null">¡Bienvenid@, {{ nombreUsuario }}!</h2>
-
-        <div v-if="sesionIniciada && usuarioEditado === null">
-            <h3>Usuarios registrados:</h3>
-            <button @click="mostrarFormularioNuevoUsuario">Agregar Usuario</button>
-            <table v-if="!formNuevoUsuarioVisible">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                        <th>Email</th>
-                        <th>Edad</th>
-                        <th>Teléfono</th>
-                        <th>Dirección</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(user, index) in usuariosRegistrados" :key="user.email">
-                        <td>{{ user.nombre }}</td>
-                        <td>{{ user.apellido }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.edad }}</td>
-                        <td>{{ user.telefono }}</td>
-                        <td>{{ user.direccion }}</td>
-                        <td>
-                            <button class="btn btn-edit" @click="editarUsuario(index)">Editar</button>
-                            <button class="btn btn-delete" @click="eliminarUsuario(index)">Eliminar</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div v-if="usuarioEditado !== null" class="form-edit">
-            <h2>Editar Usuario</h2>
-
-            <br>
-
-            <form @submit.prevent="guardarEdicion">
-                <label>Nombre:</label>
-                <input type="text" v-model="formUsuario.nombre" required>
-                <br>
-
-                <label>Apellido:</label>
-                <input type="text" v-model="formUsuario.apellido" required>
-                <br>
-
-                <label>Email:</label>
-                <input type="email" v-model="formUsuario.email" required>
-                <br>
-
-                <label>Edad:</label>
-                <input type="number" v-model="formUsuario.edad" required>
-                <br>
-
-                <label>Teléfono:</label>
-                <input type="text" v-model="formUsuario.telefono" required>
-                <br>
-
-                <label>Dirección:</label>
-                <input type="text" v-model="formUsuario.direccion" required>
-                <br><br>
-
-                <button type="submit">Guardar</button>
-                <button type="button" @click="cancelarEdicion">Cancelar</button>
-            </form>
-        </div>
-
-        <div v-if="formNuevoUsuarioVisible" class="form-edit">
-            <h2>Agregar Nuevo Usuario</h2>
-
-            <form @submit.prevent="agregarUsuario">
-                <label>Nombre:</label>
-                <input type="text" v-model="formNuevoUsuario.nombre" required>
-                <br>
-
-                <label>Apellido:</label>
-                <input type="text" v-model="formNuevoUsuario.apellido" required>
-                <br>
-
-                <label>Email:</label>
-                <input type="email" v-model="formNuevoUsuario.email" required>
-                <br>
-
-                <label>Edad:</label>
-                <input type="number" v-model="formNuevoUsuario.edad" required>
-                <br>
-
-                <label>Teléfono:</label>
-                <input type="text" v-model="formNuevoUsuario.telefono" required>
-                <br>
-
-                <label>Dirección:</label>
-                <input type="text" v-model="formNuevoUsuario.direccion" required>
-                <br><br>
-
-                <button type="submit">Agregar Usuario</button>
-                <button type="button" @click="cancelarNuevoUsuario">Cancelar</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <form id="loginForm">
+        <h1 style="color: #333;">Login</h1>
+        <input type="text" id="username" placeholder="Nombre de usuario" required />
+        <input type="password" id="password" placeholder="Contraseña" required />
+        <button type="submit">Login</button>
+    </form>
 
     <script>
-        const { createApp } = Vue;
+        const API_KEY = '131955521a9bdad782e760373ef9100e';
 
-        createApp({
-            data() {
-                return {
-                    usuario: sessionStorage.getItem('usuario') || '',
-                    contraseña: '',
-                    sesionIniciada: !!sessionStorage.getItem('sesionIniciada'),
-                    nombreUsuario: sessionStorage.getItem('nombreUsuario') || '',
-                    usuariosRegistrados: JSON.parse(sessionStorage.getItem('usuariosRegistrados')) || [],
-                    usuarioEditado: null,
-                    formUsuario: { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' },
-                    formNuevoUsuarioVisible: false,
-                    formNuevoUsuario: { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' }
-                };
-            },
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-            methods: {
-                iniciarSesion() {
-                    fetch('usuarios.json')
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Error al cargar el archivo JSON');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            const usuarioValido = data.find(u => 
-                                u.email === this.usuario && u.password === this.contraseña
-                            );
-                            if (usuarioValido) {
-                                this.sesionIniciada = true;
-                                this.nombreUsuario = usuarioValido.nombre;
-                                sessionStorage.setItem('usuario', this.usuario);
-                                sessionStorage.setItem('nombreUsuario', usuarioValido.nombre);
-                                sessionStorage.setItem('sesionIniciada', true);
-                                sessionStorage.setItem('usuariosRegistrados', JSON.stringify(data));
-                                this.usuariosRegistrados = data;
-                            } else {
-                                alert('Usuario o contraseña incorrectos');
-                            }
-                        })
-                        .catch(err => {
-                            alert('Error al cargar usuarios: ' + err.message);
-                        });
-                },
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-                editarUsuario(index) {
-                    this.usuarioEditado = index;
-                    const user = this.usuariosRegistrados[index];
-                    this.formUsuario = { ...user };
-                },
+            try {
+                const tokenResponse = await fetch(`https://api.themoviedb.org/3/authentication/token/new?api_key=${API_KEY}`);
+                const tokenData = await tokenResponse.json();
 
-                guardarEdicion() {
-                    if (this.usuarioEditado !== null) {
-                        this.usuariosRegistrados[this.usuarioEditado] = { ...this.formUsuario };
-                        sessionStorage.setItem('usuariosRegistrados', JSON.stringify(this.usuariosRegistrados));
-                        this.usuarioEditado = null;
-                    }
-                },
-
-                cancelarEdicion() {
-                    this.usuarioEditado = null;
-                },
-
-                eliminarUsuario(index) {
-                    this.usuariosRegistrados.splice(index, 1);
-                    sessionStorage.setItem('usuariosRegistrados', JSON.stringify(this.usuariosRegistrados));
-                },
-
-                mostrarFormularioNuevoUsuario() {
-                    this.formNuevoUsuarioVisible = true;
-                    this.formNuevoUsuario = { nombre: '', apellido: '', email: '', edad: '', telefono: '', direccion: '' };
-                },
-
-                agregarUsuario() {
-                    this.usuariosRegistrados.push({ ...this.formNuevoUsuario });
-                    sessionStorage.setItem('usuariosRegistrados', JSON.stringify(this.usuariosRegistrados));
-                    this.formNuevoUsuarioVisible = false;
-                },
-
-                cancelarNuevoUsuario() {
-                    this.formNuevoUsuarioVisible = false;
+                if (!tokenData.success) {
+                    throw new Error(`Error al obtener el token: ${tokenData.status_message}`);
                 }
+                
+                const requestToken = tokenData.request_token;
+
+                const validateResponse = await fetch(`https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        request_token: requestToken
+                    })
+                });
+                const validateData = await validateResponse.json();
+
+                if (!validateData.success) {
+                    throw new Error(`Error al validar el token: ${validateData.status_message}`);
+                }
+
+                const sessionResponse = await fetch(`https://api.themoviedb.org/3/authentication/session/new?api_key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ request_token: requestToken })
+                });
+                const sessionData = await sessionResponse.json();
+
+                if (!sessionData.success) {
+                    throw new Error(`Error al crear la sesión: ${sessionData.status_message}`);
+                }
+
+                localStorage.setItem('session_id', sessionData.session_id);
+                alert('Login exitoso');
+                window.location.href = 'movies.html';
+            } catch (error) {
+                alert(`Error en el proceso de login: ${error.message}`);
+                console.error(error);
             }
-        }).mount('#main');
+        });
     </script>
 </body>
 </html>

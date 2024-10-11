@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Películas Populares</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333; 
+            color: white;
+            padding: 1rem;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+        }
+        #movieList {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .movieItem {
+            background-color: #444;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .movieItem img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        .movieItem h3 {
+            font-size: 1.1rem;
+            color: white;
+        }
+        .movieItem button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .movieItem button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Películas Populares</h1>
+    <div id="movieList"></div>
+
+    <script>
+        const API_KEY = '131955521a9bdad782e760373ef9100e';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`);
+            const data = await response.json();
+            const movieList = document.getElementById('movieList');
+
+            data.results.forEach(movie => {
+                const movieItem = document.createElement('div');
+                movieItem.classList.add('movieItem');
+                movieItem.innerHTML = `
+                    <h3>${movie.title}</h3>
+                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />
+                    <button onclick="goToMovie(${movie.id})">Ver Detalles</button>
+                `;
+                movieList.appendChild(movieItem);
+            });
+        });
+
+        function goToMovie(movieId) {
+            window.location.href = `movie.html?id=${movieId}`;
+        }
+    </script>
+</body>
+</html>

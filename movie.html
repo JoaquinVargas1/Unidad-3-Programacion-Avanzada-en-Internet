@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Película</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .movie-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .movie-poster {
+            flex: 1;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .movie-details {
+            flex: 2;
+        }
+
+        .movie-details h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .movie-details p {
+            margin-bottom: 20px;
+        }
+
+        .rating-section {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .rate-button {
+            background-color: #FFD700;
+            border: none;
+            color: #333;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 10px auto;
+        }
+
+        .rate-button:hover {
+            background-color: #e5c700;
+        }
+
+        .rating-display {
+            margin: 10px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            background-color: #444;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .modal h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .slider {
+            width: 80%;
+            margin: 20px 0;
+        }
+
+        .submit-rating {
+            background-color: #FFD700;
+            border: none;
+            color: #333;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-rating:hover {
+            background-color: #e5c700;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .rating-display span {
+            color: #FFD700;
+        }
+
+        .cast {
+            margin-top: 20px;
+        }
+
+        .cast-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .cast-list li {
+            margin: 5px 0;
+        }
+
+        .rating-actions {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .delete-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="movie-container">
+        <div class="movie-poster" id="moviePoster"></div>
+        <div class="movie-details" id="movieDetails"></div>
+    </div>
+
+    <div class="rating-section" id="ratingSection">
+        <div class="rating-display" id="currentRatingDisplay"></div>
+        <div class="rating-actions">
+            <button class="rate-button" id="rateButton">Calificar esta película</button>
+            <button class="rate-button delete-button" id="deleteRatingButton">Eliminar calificación</button>
+        </div>
+    </div>
+
+    <div id="rateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h3>Califica la película</h3>
+            <input type="range" min="1" max="10" value="5" class="slider" id="ratingSlider">
+            <p>Calificación actual: <span id="ratingValue">5</span>/10</p>
+            <button class="submit-rating" id="submitRating">Enviar calificación</button>
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = '131955521a9bdad782e760373ef9100e';
+        const session_id = localStorage.getItem('session_id');
+        const movieId = new URLSearchParams(window.location.search).get('id');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${API_KEY}&language=es-MX`);
+            const movie = await response.json();
+            const moviePoster = document.getElementById('moviePoster');
+            const movieDetails = document.getElementById('movieDetails');
+            const currentRatingDisplay = document.getElementById('currentRatingDisplay');
+            const castList = document.createElement('ul');
+
+            moviePoster.innerHTML = `
+                <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}" />
+            `;
+
+            movieDetails.innerHTML = `
+                <h2>${movie.title}</h2>
+                <p><strong>Sinopsis:</strong> ${movie.overview}</p>
+                <p><strong>Género:</strong> ${movie.genres.map(genre => genre.name).join(', ')}</p>
+                <p><strong>Fecha de lanzamiento:</strong> ${movie.release_date}</p>
+                <p><strong>Idioma original:</strong> ${movie.original_language}</p>
+                <p><strong>Puntuación promedio:</strong> ${movie.vote_average} / 10</p>
+                <p><strong>Reparto:</strong></p>
+            `;
+            
+            movieDetails.appendChild(castList);
+            const savedRating = localStorage.getItem(`rating_${movieId}`);
+
+            if (savedRating) {
+                currentRatingDisplay.innerHTML = `
+                    <strong>Tu calificación:</strong> <span>${savedRating}</span>/10
+                `;
+                document.getElementById('deleteRatingButton').style.display = 'block';
+                rateButton.style.display = 'none';
+            } else {
+                currentRatingDisplay.innerHTML = "<strong>No has calificado esta película.</strong>";
+                document.getElementById('deleteRatingButton').style.display = 'none';
+            }
+
+            const castResponse = await fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${API_KEY}&language=es-MX`);
+            const castData = await castResponse.json();
+            castData.cast.slice(0, 5).forEach(actor => {
+                const li = document.createElement('li');
+                li.textContent = `${actor.name} como ${actor.character}`;
+                castList.appendChild(li);
+            });
+        });
+
+        const rateModal = document.getElementById('rateModal');
+        const rateButton = document.getElementById('rateButton');
+        const closeModal = document.getElementById('closeModal');
+        const submitRating = document.getElementById('submitRating');
+        const ratingSlider = document.getElementById('ratingSlider');
+        const ratingValue = document.getElementById('ratingValue');
+
+        rateButton.addEventListener('click', () => {
+            rateModal.style.display = 'block';
+        });
+
+        closeModal.addEventListener('click', () => {
+            rateModal.style.display = 'none';
+        });
+
+        ratingSlider.addEventListener('input', () => {
+            ratingValue.textContent = ratingSlider.value;
+        });
+
+        submitRating.addEventListener('click', async () => {
+            const rating = ratingSlider.value;
+
+            await fetch(`https://api.themoviedb.org/3/movie/${movieId}/rating?api_key=${API_KEY}&session_id=${session_id}`, {
+                method: 'POST',
+                body: JSON.stringify({ value: rating }),
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8',
+                },
+            });
+
+            localStorage.setItem(`rating_${movieId}`, rating);
+            alert('Calificación enviada');
+
+            currentRatingDisplay.innerHTML = `
+                <strong>Tu calificación:</strong> <span>${rating}</span>/10
+            `;
+            document.getElementById('deleteRatingButton').style.display = 'block';
+            rateButton.style.display = 'none';
+            rateModal.style.display = 'none';
+        });
+
+        document.getElementById('deleteRatingButton').addEventListener('click', () => {
+            localStorage.removeItem(`rating_${movieId}`);
+            alert('Calificación eliminada');
+            currentRatingDisplay.innerHTML = "<strong>No has calificado esta película.</strong>";
+            document.getElementById('deleteRatingButton').style.display = 'none';
+            rateButton.style.display = 'block';
+        });
+
+        window.onclick = function(event) {
+            if (event.target === rateModal) {
+                rateModal.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>
